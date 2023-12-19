@@ -10889,6 +10889,12 @@ loop is unrolled or not will be determined by target costing.  The resulting
 vectorized loop may still be unrolled more in later passes depending on the
 target costing.
 
+@cindex pragma, unroll
+@item #pragma unroll @var{n}
+
+This pragma is an alias for @code{#pragma GCC unroll @var{n}} for
+inter-compiler compatibility.
+
 @end table
 
 @node Thread-Local

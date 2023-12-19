@@ -57771,6 +57771,7 @@ cp_parser_pragma (cp_parser *parser, enum pragma_context context, bool *if_p)
 
     case PRAGMA_IVDEP:
     case PRAGMA_UNROLL:
+    case PRAGMA_UNROLL_UNQUALIFIED:
     case PRAGMA_NOVECTOR:
       {
 	bool ivdep = false;
@@ -57783,6 +57784,7 @@ cp_parser_pragma (cp_parser *parser, enum pragma_context context, bool *if_p)
 	  case PRAGMA_IVDEP:
 	    pragma_str = "ivdep";
 	    break;
+	  case PRAGMA_UNROLL_UNQUALIFIED:
 	  case PRAGMA_UNROLL:
 	    pragma_str = "unroll";
 	    break;
@@ -57814,6 +57816,7 @@ cp_parser_pragma (cp_parser *parser, enum pragma_context context, bool *if_p)
 		    ivdep = cp_parser_pragma_ivdep (parser, tok);
 		    break;
 		  }
+		case PRAGMA_UNROLL_UNQUALIFIED:
 		case PRAGMA_UNROLL:
 		  {
 		    if (tok != pragma_tok)

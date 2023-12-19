@@ -16027,7 +16027,7 @@ c_parse_pragma_novector (c_parser *parser)
   return true;
 }
 
-/* Parse a pragma GCC unroll.  */
+/* Parse a pragma GCC unroll or a pragma unroll.  */
 
 static unsigned short
 c_parser_pragma_unroll (c_parser *parser)
@@ -16291,6 +16291,7 @@ c_parser_pragma (c_parser *parser, enum pragma_context context, bool *if_p,
 
     case PRAGMA_NOVECTOR:
     case PRAGMA_UNROLL:
+    case PRAGMA_UNROLL_UNQUALIFIED:
     case PRAGMA_IVDEP:
       {
 	bool novector = false;
@@ -16303,6 +16304,9 @@ c_parser_pragma (c_parser *parser, enum pragma_context context, bool *if_p,
 	    novector = c_parse_pragma_novector (parser);
 	    break;
 	  case PRAGMA_UNROLL:
+	    unroll = c_parser_pragma_unroll (parser);
+	    break;
+	  case PRAGMA_UNROLL_UNQUALIFIED:
 	    unroll = c_parser_pragma_unroll (parser);
 	    break;
 	  case PRAGMA_IVDEP:
@@ -16322,6 +16326,9 @@ c_parser_pragma (c_parser *parser, enum pragma_context context, bool *if_p,
 		ivdep = c_parse_pragma_ivdep (parser);
 		break;
 	      case PRAGMA_UNROLL:
+		unroll = c_parser_pragma_unroll (parser);
+		break;
+	      case PRAGMA_UNROLL_UNQUALIFIED:
 		unroll = c_parser_pragma_unroll (parser);
 		break;
 	      case PRAGMA_NOVECTOR:
