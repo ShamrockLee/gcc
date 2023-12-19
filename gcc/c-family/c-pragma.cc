@@ -1823,6 +1823,10 @@ init_pragma (void)
 				  false, false);
 
   if (!flag_preprocess_only)
+    cpp_register_deferred_pragma (parse_in, 0, "unroll", PRAGMA_UNROLL_TOPLEVEL,
+				  false, false);
+
+  if (!flag_preprocess_only)
     cpp_register_deferred_pragma (parse_in, "GCC", "novector", PRAGMA_NOVECTOR,
 				  false, false);
 

@@ -13920,7 +13920,7 @@ cp_build_bit_cast (location_t loc, tree type, tree arg,
    it if needed.  */
 
 tree
-cp_check_pragma_unroll (location_t loc, tree unroll)
+cp_check_pragma_unroll (location_t loc, tree unroll, is_toplevel)
 {
   HOST_WIDE_INT lunroll = 0;
   if (type_dependent_expression_p (unroll))

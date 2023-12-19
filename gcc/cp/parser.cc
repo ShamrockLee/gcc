@@ -52798,11 +52798,11 @@ cp_parser_pragma_ivdep (cp_parser *parser, cp_token *pragma_tok)
 /* Parse a pragma GCC unroll.  */
 
 static tree
-cp_parser_pragma_unroll (cp_parser *parser, cp_token *pragma_tok)
+cp_parser_pragma_unroll (cp_parser *parser, cp_token *pragma_tok, bool is_toplevel = false)
 {
   location_t location = cp_lexer_peek_token (parser->lexer)->location;
   tree unroll = cp_parser_constant_expression (parser);
-  unroll = cp_check_pragma_unroll (location, fold_non_dependent_expr (unroll));
+  unroll = cp_check_pragma_unroll (location, fold_non_dependent_expr (unroll), is_toplevel);
   cp_parser_skip_to_pragma_eol (parser, pragma_tok);
   return unroll;
 }
@@ -53166,11 +53166,14 @@ cp_parser_pragma (cp_parser *parser, enum pragma_context context, bool *if_p)
 
     case PRAGMA_IVDEP:
     case PRAGMA_UNROLL:
+    case PRAGMA_UNROLL_TOPLEVEL:
     case PRAGMA_NOVECTOR:
       {
 	bool ivdep = false;
 	tree unroll = NULL_TREE;
 	bool novector = false;
+  bool is_toplevel = false;
+  const char *pragma_infix = "GCC ";
 	const char *pragma_str;
 
 	switch (id)
@@ -53178,6 +53181,9 @@ cp_parser_pragma (cp_parser *parser, enum pragma_context context, bool *if_p)
 	  case PRAGMA_IVDEP:
 	    pragma_str = "ivdep";
 	    break;
+    case PRAGMA_UNROLL_TOPLEVEL:
+      is_toplevel = true;
+      pragma_infix = "";
 	  case PRAGMA_UNROLL:
 	    pragma_str = "unroll";
 	    break;
@@ -53191,8 +53197,8 @@ cp_parser_pragma (cp_parser *parser, enum pragma_context context, bool *if_p)
 	if (context == pragma_external)
 	  {
 	    error_at (pragma_tok->location,
-		      "%<#pragma GCC %s%> must be inside a function",
-		      pragma_str);
+		      "%<#pragma %s%s%> must be inside a function",
+		      pragma_infix, pragma_str);
 	    break;
 	  }
 
@@ -53209,11 +53215,12 @@ cp_parser_pragma (cp_parser *parser, enum pragma_context context, bool *if_p)
 		    ivdep = cp_parser_pragma_ivdep (parser, tok);
 		    break;
 		  }
+    case PRAGMA_UNROLL_TOPLEVEL:
 		case PRAGMA_UNROLL:
 		  {
 		    if (tok != pragma_tok)
 		      tok = cp_lexer_consume_token (parser->lexer);
-		    unroll = cp_parser_pragma_unroll (parser, tok);
+		    unroll = cp_parser_pragma_unroll (parser, tok, is_toplevel);
 		    break;
 		  }
 		case PRAGMA_NOVECTOR:

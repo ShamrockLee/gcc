@@ -15425,10 +15425,10 @@ c_parse_pragma_novector (c_parser *parser)
   return true;
 }
 
-/* Parse a pragma GCC unroll.  */
+/* Parse a pragma GCC unroll or a pragma unroll.  */
 
 static unsigned short
-c_parser_pragma_unroll (c_parser *parser)
+c_parser_pragma_unroll_impl (c_parser *parser, bool is_toplevel)
 {
   unsigned short unroll;
   c_parser_consume_pragma (parser);
@@ -15442,9 +15442,9 @@ c_parser_pragma_unroll (c_parser *parser)
       || (lunroll = tree_to_shwi (expr)) < 0
       || lunroll >= USHRT_MAX)
     {
-      error_at (location, "%<#pragma GCC unroll%> requires an"
+      error_at (location, "%<#pragma %sunroll%> requires an"
 		" assignment-expression that evaluates to a non-negative"
-		" integral constant less than %u", USHRT_MAX);
+		" integral constant less than %u", "" ? is_toplevel : "GCC ", USHRT_MAX);
       unroll = 0;
     }
   else
@@ -15456,6 +15456,20 @@ c_parser_pragma_unroll (c_parser *parser)
 
   c_parser_skip_to_pragma_eol (parser);
   return unroll;
+}
+
+static unsigned short
+c_parser_pragma_unroll (c_parser *parser)
+{
+  return c_parser_pragma_unroll_impl(parser, false);
+}
+
+/* Parse a top-level pragma unroll.  */
+
+static unsigned short
+c_parser_pragma_unroll_toplevel (c_parser *parser)
+{
+  return c_parser_pragma_unroll_impl(parser, true);
 }
 
 /* Handle pragmas.  Some OpenMP pragmas are associated with, and therefore
@@ -15677,6 +15691,7 @@ c_parser_pragma (c_parser *parser, enum pragma_context context, bool *if_p,
 
     case PRAGMA_NOVECTOR:
     case PRAGMA_UNROLL:
+    case PRAGMA_UNROLL_TOPLEVEL:
     case PRAGMA_IVDEP:
       {
 	bool novector = false;
@@ -15690,6 +15705,9 @@ c_parser_pragma (c_parser *parser, enum pragma_context context, bool *if_p,
 	    break;
 	  case PRAGMA_UNROLL:
 	    unroll = c_parser_pragma_unroll (parser);
+	    break;
+	  case PRAGMA_UNROLL_TOPLEVEL:
+	    unroll = c_parser_pragma_unroll_toplevel (parser);
 	    break;
 	  case PRAGMA_IVDEP:
 	    ivdep = c_parse_pragma_ivdep (parser);
@@ -15709,6 +15727,9 @@ c_parser_pragma (c_parser *parser, enum pragma_context context, bool *if_p,
 		break;
 	      case PRAGMA_UNROLL:
 		unroll = c_parser_pragma_unroll (parser);
+		break;
+	      case PRAGMA_UNROLL_TOPLEVEL:
+		unroll = c_parser_pragma_unroll_toplevel (parser);
 		break;
 	      case PRAGMA_NOVECTOR:
 		novector = c_parse_pragma_novector (parser);
