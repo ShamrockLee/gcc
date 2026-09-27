@@ -16030,10 +16030,16 @@ c_parse_pragma_novector (c_parser *parser)
 /* Parse a pragma GCC unroll or a pragma unroll.  */
 
 static unsigned short
-c_parser_pragma_unroll (c_parser *parser)
+c_parser_pragma_unroll (c_parser *parser, bool is_unqualified)
 {
   unsigned short unroll;
   c_parser_consume_pragma (parser);
+  if (is_unqualified && c_parser_peek_token (parser)->type == CPP_PRAGMA_EOL)
+    {
+      c_parser_skip_to_pragma_eol (parser);
+      unroll = USHRT_MAX - 1;
+      return unroll;
+    }
   location_t location = c_parser_peek_token (parser)->location;
   tree expr = c_parser_expr_no_commas (parser, NULL).value;
   mark_exp_read (expr);
@@ -16304,10 +16310,10 @@ c_parser_pragma (c_parser *parser, enum pragma_context context, bool *if_p,
 	    novector = c_parse_pragma_novector (parser);
 	    break;
 	  case PRAGMA_UNROLL:
-	    unroll = c_parser_pragma_unroll (parser);
+	    unroll = c_parser_pragma_unroll (parser, false);
 	    break;
 	  case PRAGMA_UNROLL_UNQUALIFIED:
-	    unroll = c_parser_pragma_unroll (parser);
+	    unroll = c_parser_pragma_unroll (parser, true);
 	    break;
 	  case PRAGMA_IVDEP:
 	    ivdep = c_parse_pragma_ivdep (parser);
@@ -16326,10 +16332,10 @@ c_parser_pragma (c_parser *parser, enum pragma_context context, bool *if_p,
 		ivdep = c_parse_pragma_ivdep (parser);
 		break;
 	      case PRAGMA_UNROLL:
-		unroll = c_parser_pragma_unroll (parser);
+		unroll = c_parser_pragma_unroll (parser, false);
 		break;
 	      case PRAGMA_UNROLL_UNQUALIFIED:
-		unroll = c_parser_pragma_unroll (parser);
+		unroll = c_parser_pragma_unroll (parser, true);
 		break;
 	      case PRAGMA_NOVECTOR:
 		novector = c_parse_pragma_novector (parser);

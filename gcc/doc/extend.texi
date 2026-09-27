@@ -10895,6 +10895,18 @@ target costing.
 This pragma is an alias for @code{#pragma GCC unroll @var{n}} for
 inter-compiler compatibility.
 
+@cindex pragma, unroll
+@item #pragma unroll
+
+This pragma completely unrolls a loop with a compile-time constant trip count
+less than @code{USHRT_MAX - 1}.
+
+Loops with even larger trip counts will be unrolled
+with heuristic unrolling factors instead of complete unrolling.
+
+Note that no code-size limit is applied on the presence of this pragma --
+use with care on loops with large trip counts or loop bodies.
+
 @end table
 
 @node Thread-Local

@@ -57389,8 +57389,15 @@ cp_parser_pragma_ivdep (cp_parser *parser, cp_token *pragma_tok)
 /* Parse a pragma GCC unroll.  */
 
 static tree
-cp_parser_pragma_unroll (cp_parser *parser, cp_token *pragma_tok)
+cp_parser_pragma_unroll (cp_parser *parser, cp_token *pragma_tok,
+			    bool is_unqualified)
 {
+  if (is_unqualified
+      && cp_lexer_peek_token (parser->lexer)->type == CPP_PRAGMA_EOL)
+    {
+      cp_parser_skip_to_pragma_eol (parser, pragma_tok);
+      return build_int_cst (integer_type_node, USHRT_MAX - 1);
+    }
   location_t location = cp_lexer_peek_token (parser->lexer)->location;
   tree unroll = cp_parser_constant_expression (parser);
   unroll = cp_check_pragma_unroll (location, fold_non_dependent_expr (unroll));
@@ -57817,11 +57824,17 @@ cp_parser_pragma (cp_parser *parser, enum pragma_context context, bool *if_p)
 		    break;
 		  }
 		case PRAGMA_UNROLL_UNQUALIFIED:
+		  {
+		    if (tok != pragma_tok)
+		      tok = cp_lexer_consume_token (parser->lexer);
+		    unroll = cp_parser_pragma_unroll (parser, tok, true);
+		    break;
+		  }
 		case PRAGMA_UNROLL:
 		  {
 		    if (tok != pragma_tok)
 		      tok = cp_lexer_consume_token (parser->lexer);
-		    unroll = cp_parser_pragma_unroll (parser, tok);
+		    unroll = cp_parser_pragma_unroll (parser, tok, false);
 		    break;
 		  }
 		case PRAGMA_NOVECTOR:
